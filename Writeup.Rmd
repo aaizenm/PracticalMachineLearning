@@ -29,9 +29,22 @@ train <- read.csv("./data/pml-training.csv", header = TRUE, na.strings = c("NA",
 test <- read.csv("./data/pml-testing.csv", header = TRUE, na.strings = c("NA", ""))
 
 ```
+#dim(test)
+#names(train)
+
 dim(train)
 
 We see that the training set consists of 19622 observations of 160 variables
-#dim(test)
-#names(train)
+```{r}
+sum(complete.cases(train))
+#head(train)
+```
+
+
+```{r}
+
+
+
+
+
 
