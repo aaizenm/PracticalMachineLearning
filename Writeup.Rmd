@@ -25,3 +25,13 @@ assigning missing values to entries that are currently 'NA' or blank.
 #getwd()
 setwd("C:/PredictiveAnalysis/R")
 
+train <- read.csv("./data/pml-training.csv", header = TRUE, na.strings = c("NA", ""))
+test <- read.csv("./data/pml-testing.csv", header = TRUE, na.strings = c("NA", ""))
+
+```
+dim(train)
+
+We see that the training set consists of 19622 observations of 160 variables
+#dim(test)
+#names(train)
+
