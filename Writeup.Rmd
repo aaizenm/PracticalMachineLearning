@@ -56,7 +56,7 @@ newtest<- test[,colSums(is.na(test))==0]
 dim(newtrain)
 ```
 
-As we see we have eliminated 2/3 of the columns.
+As we see we have eliminated 2/3 of the columns. 60 columns.
 
 #head(newtrain)
 
@@ -64,11 +64,17 @@ Some of the variables in this new data set do not come from accelerometer measur
 setup or participants' data.
 
 So the following variables will be take out as well: 
-X, user_name, raw_timestamp_part1, raw_timestamp_part2, cvtd_timestamp, new_window and num_window.
+X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, new_window and num_window.
 
 ```{r}
+todelete_cols <- grepl("X|user_name|new_window|num_window|raw_timestamp_part_1|raw_timestamp_part_2|cvtd_timestamp", colnames(newtrain))
+finaltrain <- newtrai[, !todelete_cols]
+finaltrain <- newtrain[, !todelete_cols]
+#names(finaltrain)
 
+Now we have 53 columns to work with.
 ```
+
 
 
 
