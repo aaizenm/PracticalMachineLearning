@@ -12,6 +12,7 @@ Note : to be reproductible, I also set the seed value.
 library(caret)
 library(randomForest)
 library(Hmisc)
+library(corrplot)
 
 set.seed(1234)
 ```
@@ -33,6 +34,8 @@ test <- read.csv("./data/pml-testing.csv", header = TRUE, na.strings = c("NA", "
 #names(train)
 
 dim(train)
+
+## Cleaning the data
 
 We see that the training set consists of 19622 observations of 160 variables
 ```{r}
@@ -75,6 +78,42 @@ finaltrain <- newtrain[, !todelete_cols]
 Now we have 53 columns to work with.
 ```
 dim(finaltrain)
+
+## Spliting the data for validation purposes
+
+Now we will split the final training dataset into a training (70% of the observations) and a validation 
+(30% of the observations). 
+
+This validation dataset will allow us to perform cross validation for developing/testing our model.
+
+
+```{r}
+inTrain = createDataPartition(y = finaltrain$classe, p = 0.7, list = FALSE)
+finaltrain_train = finaltrain[inTrain, ]
+finaltrain_valid = finaltrain[-inTrain, ]
+```
+
+## Understanding the Correlations between variables
+
+We begin by looking at the correlations between the variables in our dataset. 
+We may want to remove highly correlated predictors from our analysis and replace them with weighted 
+combinations of predictors. 
+
+The goal of your project is to predict the manner in which they did the exercise. 
+This is the "classe" variable in the training set. 
+
+```{r}
+correlMatrix <- cor(finaltrain_train[, -53])
+corrplot(correlMatrix, order = "FPC", method = "circle", type = "lower", tl.cex = 0.8,  tl.col = rgb(0, 0, 0))
+```
+
+This correlation plot shows the correlation between pairs of the predictors in our dataset. 
+From a high-level perspective darker blue and darker red circles indicate high positive and high negative correlations, 
+respectively. 
+
+Nonetheless, there are a few pairs of variables that are highly correlated:
+
+
 
 
 
