@@ -40,8 +40,39 @@ sum(complete.cases(train))
 #head(train)
 ```
 
+The discussion here is choosing between:
+Or discarding most of the observations but using more predictors 
+Or discarding some predictors to keep most of the observations.
+The conclusion is that more observations is better, while additional variables may or may not helping us.
 
 ```{r}
+Columns in the orignal training and testing datasets that are mostly filled with missing values are removed. 
+
+# colSums(is.na(train))   ## This will give us which columns have 0 values
+# colSums(is.na(train))==0  ## will give us a set of FALSE and TRUE values 
+
+newtrain<- train[,colSums(is.na(train))==0]
+newtest<- test[,colSums(is.na(test))==0]
+dim(newtrain)
+```
+
+As we see we have eliminated 2/3 of the columns.
+
+#head(newtrain)
+
+Some of the variables in this new data set do not come from accelerometer measurements and record experimental
+setup or participants' data.
+
+So the following variables will be take out as well: 
+X, user_name, raw_timestamp_part1, raw_timestamp_part2, cvtd_timestamp, new_window and num_window.
+
+```{r}
+
+```
+
+
+
+
 
 
 
