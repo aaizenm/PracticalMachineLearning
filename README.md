@@ -8,6 +8,8 @@ The "Data Science" Specialization Coursera - Johns Hopkins
 
 ##Contents:
 1)  Writeup.Rmd = The main program (markdown document)
+
 2)  Writeup.html = The html file
+
 3)   Writeup.md  = The md file
 
