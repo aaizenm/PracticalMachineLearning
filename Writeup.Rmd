@@ -74,6 +74,8 @@ finaltrain <- newtrain[, !todelete_cols]
 
 Now we have 53 columns to work with.
 ```
+dim(finaltrain)
+
 
 
 
