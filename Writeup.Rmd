@@ -113,6 +113,19 @@ respectively.
 
 Nonetheless, there are a few pairs of variables that are highly correlated:
 
+which(correlMatrix > 0.98 & correlMatrix != 1)
+correlMatrix[which(correlMatrix > 0.98 & correlMatrix != 1)]
+correlMatrix[which(correlMatrix < -0.98 )]
+
+
+## Predictive Model
+preProc <- preProcess(finaltrain_train[, -53], method = "pca", thresh = 0.99)
+trainPC <- predict(preProc, finaltrain_train[, -53])
+validationTestPC <- predict(preProc, finaltrain_valid[, -53])
+
+
+modelFit <- train(finaltrain_train$classe ~ ., method = "rf", data = trainPC, trControl = trainControl(method = "cv", number = 4), importance = TRUE)
+
 
 
 
