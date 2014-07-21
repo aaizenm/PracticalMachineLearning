@@ -26,7 +26,7 @@ We begin by loading the required libraries and reading in the training and testi
 
 
 
-2)  Writeup.html = The html file
+## 2)  Writeup.html = The html file
 
-3)   Writeup.md  = The md file
+## 3)   Writeup.md  = The md file
 
