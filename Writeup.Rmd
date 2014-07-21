@@ -1,0 +1,17 @@
+## Backgrownd
+
+For this assignment, I build a predictive model to determine whether a particular form of exercise (barbell lifting) 
+is performed correctly, using accelerometer data.
+
+## Loading of the packages
+The first part is the declaration of the package which will be used. 
+
+Note : to be reproductible, I also set the seed value.
+
+```{r}
+library(caret)
+library(randomForest)
+library(Hmisc)
+
+set.seed(4356)
+```
