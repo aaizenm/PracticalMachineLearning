@@ -13,5 +13,15 @@ library(caret)
 library(randomForest)
 library(Hmisc)
 
-set.seed(4356)
+set.seed(1234)
 ```
+## Reading of the Data
+
+We begin by reading in the training and testing datasets, 
+assigning missing values to entries that are currently 'NA' or blank.
+(commands are commented to limit the output size. You can run it deleting the "#" ) 
+
+```{r}
+#getwd()
+setwd("C:/PredictiveAnalysis/R")
+
