@@ -3,7 +3,8 @@ Practical Machine Learning
 ## By Abraham Aizenman July 07/2014
 
 The "Data Science" Specialization Coursera - Johns Hopkins
-## Goal of the Project (Personal Activiy Monitor): to predict the manner in which this (*) exercise was done.
+## Goal of the Project:
+(Personal Activiy Monitor): to predict the manner in which this (*) exercise was done.
 (*) http://groupware.les.inf.puc-rio.br/har. 
 
 ##Contents:
