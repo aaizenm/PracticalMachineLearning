@@ -104,6 +104,8 @@ correlMatrix <- cor(finaltrain_train[, -53])
 corrplot(correlMatrix, order = "FPC", method = "circle", type = "lower", tl.cex = 0.8,  tl.col = rgb(0, 0, 0))
 ```
 
+![plot of plotvariables](plots/plotvariables.png) 
+
 This correlation plot shows the correlation between pairs of the predictors in our dataset. 
 From a high-level perspective darker blue and darker red circles indicate high positive and high negative correlations, respectively. 
 
@@ -146,7 +148,7 @@ Now can review the relative importance of the resulting principal components of 
 ```{r}
 varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = .6,  main = "Importance of the Principal Variables")
 ```
-![plot of plotvariables](plots/plotvariables.png) 
+![plot of plotimportance](plots/plotimportance.png) 
 
 Now we show the The degree of importance is shown on the x-axis–increasing from left to right. 
 
