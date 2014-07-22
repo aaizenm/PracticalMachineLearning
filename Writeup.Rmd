@@ -192,11 +192,23 @@ which seems to indicate the algorithm employed by them, it made good use of prov
 The following command can be used to obtain model's prediction for the assigned testing data set:
 
 ```{r}
-predict(model3, finaltest)
+finalprediction3<-predict(model3, finaltest)
 '''
 Conclusion: The model achieves 100% accuracy on the testing set provided.
 
+Writing the text files, we'll use the following function:
+```{r}
+pml_write_files = function(x) {
+    n = length(x)
+    for (i in 1:n) {
+        filename = paste0("problem_id_", i, ".txt")
+        write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, 
+            col.names = FALSE)
+    }
+}
 
+pml_write_files(as.character(finalprediction3))
+```
 
 
 
