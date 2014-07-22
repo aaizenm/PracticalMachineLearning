@@ -135,7 +135,7 @@ would have been used. The bootstrapping method take a much longer time to comple
 
 ```{r}
 modelFit <- train(finaltrain_train$classe ~ ., method = "rf", data = trainPC, trControl = trainControl(method = "cv", number = 4), importance = TRUE)
-This took some minuts to process, (and therefore I'll try using a different function.)
+This took some minutes to process, (and therefore I'll try using a different method.)
 modelFit
 modelFit$finalModel
 ```
@@ -144,8 +144,19 @@ Now can review the relative importance of the resulting principal components of 
 ```{r}
 varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = .6,  main = "Importance of the Individual Principal Components")
 ```
+Now we show the The degree of importance is shown on the x-axis–increasing from left to right. 
 
+## Making my PC to work in parallel to cut the processing time
+Not in the scope of this assignment, it will be convenient to add the following statements to accelerate the processing
+time by using in parallel more than one CPUs
+```{r}
+install.packages("doParallel")
+library(doParallel)
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+```
 
+## Predictive Model - Method 2
 
 
 
