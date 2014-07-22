@@ -77,7 +77,9 @@ This is the "classe" variable in the training set. </p>
 corrplot(correlMatrix, order = &quot;FPC&quot;, method = &quot;circle&quot;, type = &quot;lower&quot;, tl.cex = 0.8,  tl.col = rgb(0, 0, 0))
 </code></pre>
 
-<p><img alt="plot of plotvariables" src="plots/plotvariables.png" /> </p>
+
+ 
+
 <p>This correlation plot shows the correlation between pairs of the predictors in our dataset. 
 From a high-level perspective darker blue and darker red circles indicate high positive and high negative correlations, respectively. </p>
 <p>Nonetheless, there are a few pairs of variables that are highly correlated:</p>
@@ -110,7 +112,9 @@ This method will give us an error rate: 1.88%</p>
 <pre><code class="r">varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = .6,  main = &quot;Importance of the Principal Variables&quot;)
 </code></pre>
 
-<p><img alt="plot of plotimportance" src="plots/plotimportance.png" /> </p>
+ 
+
+
 <p>Now we show the The degree of importance is shown on the x-axis–increasing from left to right. </p>
 <h2 id="cross-validation-testing-and-out-of-sample-error-estimate">Cross Validation Testing and Out-of-Sample Error Estimate</h2>
 <p>Call the 'predict' function again so that our trained model can be applied to our cross validation test dataset.</p>
