@@ -1,0 +1,179 @@
+<h2 id="backgrownd">Backgrownd</h2>
+<p>For this assignment, I build a predictive model to determine whether a particular form of exercise (barbell lifting) 
+is performed correctly, using accelerometer data.</p>
+<h2 id="loading-of-the-packages">Loading of the packages</h2>
+<p>The first part is the declaration of the package which will be used. </p>
+<p>Note : to be reproductible, I also set the seed value.</p>
+<pre><code class="r">library(caret)
+library(randomForest)
+library(Hmisc)
+library(corrplot)
+
+set.seed(1234)
+</code></pre>
+
+<h2 id="reading-of-the-data">Reading of the Data</h2>
+<p>We begin by reading in the training and testing datasets, 
+assigning missing values to entries that are currently 'NA' or blank.
+(commands are commented to limit the output size. You can run it deleting the "#" ) </p>
+<pre><code class="r">#getwd()
+setwd(&quot;C:/PredictiveAnalysis/R&quot;)
+
+train &lt;- read.csv(&quot;./data/pml-training.csv&quot;, header = TRUE, na.strings = c(&quot;NA&quot;, &quot;&quot;))
+test &lt;- read.csv(&quot;./data/pml-testing.csv&quot;, header = TRUE, na.strings = c(&quot;NA&quot;, &quot;&quot;))
+dim(test)
+dim(train)
+</code></pre>
+
+<h2 id="cleaning-the-data">Cleaning the data</h2>
+<p>We see that the training set consists of 19622 observations of 160 variables</p>
+<pre><code class="r">sum(complete.cases(train))
+#head(train)
+</code></pre>
+
+<p>The discussion here is choosing between:
+Or discarding most of the observations but using more predictors 
+Or discarding some predictors to keep most of the observations.
+The conclusion is that more observations is better, while additional variables may or may not helping us.</p>
+<p>Columns in the orignal training and testing datasets that are mostly filled with missing values are removed. </p>
+<pre><code class="r"># colSums(is.na(train))   ## This will give us which columns have 0 values
+# colSums(is.na(train))==0  ## will give us a set of FALSE and TRUE values 
+
+newtrain&lt;- train[,colSums(is.na(train))==0]
+newtest&lt;- test[,colSums(is.na(test))==0]
+dim(newtrain)
+</code></pre>
+
+<p>As we see we have eliminated 2/3 of the columns. 60 columns.</p>
+<p>Some of the variables in this new data set do not come from accelerometer measurements and record experimental
+setup or participants' data.</p>
+<p>So the following variables will be take out as well: 
+X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, new_window and num_window.</p>
+<pre><code class="r">todelete_cols &lt;- grepl(&quot;X|user_name|new_window|num_window|raw_timestamp_part_1|raw_timestamp_part_2|cvtd_timestamp&quot;, colnames(newtrain))
+finaltrain &lt;- newtrain[, !todelete_cols]
+finaltest &lt;- newtest[, !todelete_cols]
+#names(finaltrain)
+dim(finaltrain)
+
+</code></pre>
+
+<p>Now we have 53 columns to work with.</p>
+<h2 id="spliting-the-data-for-validation-purposes">Spliting the data for validation purposes</h2>
+<p>Now we will split the final training dataset into a training (70% of the observations) and a validation 
+(30% of the observations). </p>
+<p>This validation dataset will allow us to perform cross validation for developing/testing our model.</p>
+<pre><code class="r">inTrain = createDataPartition(y = finaltrain$classe, p = 0.7, list = FALSE)
+finaltrain_train = finaltrain[inTrain, ]
+finaltrain_valid = finaltrain[-inTrain, ]
+</code></pre>
+
+<h2 id="understanding-the-correlations-between-variables">Understanding the Correlations between variables</h2>
+<p>We begin by looking at the correlations between the variables in our dataset. 
+We may want to remove highly correlated predictors from our analysis and replace them with weighted 
+combinations of predictors. </p>
+<p>The goal of your project is to predict the manner in which they did the exercise. 
+This is the "classe" variable in the training set. </p>
+<pre><code class="r">correlMatrix &lt;- cor(finaltrain_train[, -53])
+corrplot(correlMatrix, order = &quot;FPC&quot;, method = &quot;circle&quot;, type = &quot;lower&quot;, tl.cex = 0.8,  tl.col = rgb(0, 0, 0))
+</code></pre>
+
+<p><img alt="plot of plotvariables" src="plots/plotvariables.png" /> </p>
+<p>This correlation plot shows the correlation between pairs of the predictors in our dataset. 
+From a high-level perspective darker blue and darker red circles indicate high positive and high negative correlations, respectively. </p>
+<p>Nonetheless, there are a few pairs of variables that are highly correlated:</p>
+<pre><code class="r">which(correlMatrix &gt; 0.98 &amp; correlMatrix != 1)
+correlMatrix[which(correlMatrix &gt; 0.98 &amp; correlMatrix != 1)]
+correlMatrix[which(correlMatrix &lt; -0.98 )]
+</code></pre>
+
+<h2 id="predictive-model-method-1">Predictive Model - Method 1</h2>
+<h6></h6>
+<p>Now , its time to pre-process the data using a principal component analysis, leaving out the column we want to predict ('classe'). 
+After pre-processing, we use the 'predict' function to apply the pre-processing to the training and validation of the final training dataset.</p>
+<pre><code class="r">preProc &lt;- preProcess(finaltrain_train[, -53], method = &quot;pca&quot;, thresh = 0.99)
+trainPC &lt;- predict(preProc, finaltrain_train[, -53])
+validationTestPC &lt;- predict(preProc, finaltrain_valid[, -53])
+</code></pre>
+
+<p>Now, we train a model using a random forest approach on the smaller training dataset. 
+Note that we chose to specify the use of a cross validation method when applying the random forest routine in the 'trainControl()' parameter. Worth mentioning that without specifying this, the default method (bootstrapping) would have been used. The bootstrapping method take a much longer time to complete, and we get the same level of 'accuracy'.</p>
+<p>Based on our problem: multi-dimensional classification with number of observations much exceeding the number of predictors, Random forest is a good choice.</p>
+<pre><code class="r">modelFit &lt;- train(finaltrain_train$classe ~ ., method = &quot;rf&quot;, data = trainPC, trControl = trainControl(method = &quot;cv&quot;, number = 4), importance = TRUE)
+modelFit
+modelFit$finalModel
+
+</code></pre>
+
+<p>This took some minutes to process, (and therefore I'll try using a different method.)
+This method will give us an error rate: 1.88%</p>
+<p>Now can review the relative importance of the resulting principal components of the trained model, 'modelFit':</p>
+<pre><code class="r">varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = .6,  main = &quot;Importance of the Principal Variables&quot;)
+</code></pre>
+
+<p><img alt="plot of plotimportance" src="plots/plotimportance.png" /> </p>
+<p>Now we show the The degree of importance is shown on the x-axis–increasing from left to right. </p>
+<h2 id="cross-validation-testing-and-out-of-sample-error-estimate">Cross Validation Testing and Out-of-Sample Error Estimate</h2>
+<p>Call the 'predict' function again so that our trained model can be applied to our cross validation test dataset.</p>
+<pre><code class="r">predictionvalidationrf &lt;- predict(modelFit, validationTestPC)
+confusionMatrix(finaltrain_valid$classe, predictionvalidationrf)
+</code></pre>
+
+<p>Which gives an Accuracy : 97.7% 
+And an estimated out-of-sample error based applying to the cross validation dataset is 2.33%.</p>
+<h2 id="predicted-results">Predicted Results</h2>
+<pre><code class="r">testPC&lt;-predict(preProc, finaltest[,-53])
+predictionfinal1&lt;-predict(modelFit, testPC)
+predictionfinal1
+</code></pre>
+
+<p>Conclusion: The model achieves 90% accuracy on the testing set provided.
+So, I am going to predict with a different function (randomForest)</p>
+<h2 id="predictive-model-method-2">Predictive Model - Method 2</h2>
+<h6></h6>
+<p>Using the randomForest model fuction with the complete dataset (before spliting it for the validation process used in the
+Method 1)</p>
+<p>For the dimensions of our problem I would start ntree=1024</p>
+<pre><code class="r">set.seed(1234)
+dim(finaltrain_train)
+
+model3 &lt;- randomForest(classe ~ ., data = finaltrain, ntree = 1024)
+model3
+</code></pre>
+
+<p>It will give us an OOB estimate of  error rate: 0.27%, which is very good!
+As well the confusion Matrix looks good, indicating that the model fit the training set well.</p>
+<p>Now lets calculate the variable importance order estimate that we got from the classifier training algorithm.</p>
+<pre><code class="r">imp3&lt;-varImp(model3)
+imp3$variables&lt;-row.names(imp3)
+imp3[order(imp3$Overall,decreasing=T),]
+</code></pre>
+
+<p>Only very few variables have lower importance measure more than the most important variables (roll_belt, yaw_belt), 
+which seems to indicate the algorithm employed by them, it made good use of provided predictors.</p>
+<h2 id="predicted-results-and-apply-it-on-20-test-cases-for-automatic-grading">Predicted Results and apply it on 20 test cases for automatic grading</h2>
+<p>The following command can be used to obtain model's prediction for the assigned testing data set:</p>
+<pre><code class="r">finalprediction3&lt;-predict(model3, finaltest)
+</code></pre>
+
+<p>Conclusion: The model achieves 100% accuracy on the testing set provided.</p>
+<p>Writing the text files, we'll use the following function:</p>
+<pre><code class="r">pml_write_files = function(x) {
+    n = length(x)
+    for (i in 1:n) {
+        filename = paste0(&quot;problem_id_&quot;, i, &quot;.txt&quot;)
+        write.table(x[i], file = filename, quote = FALSE, row.names = FALSE, 
+            col.names = FALSE)
+    }
+}
+
+pml_write_files(as.character(finalprediction3))
+</code></pre>
+
+<h2 id="making-my-pc-to-work-in-parallel-to-cut-the-processing-time">Making my PC to work in parallel to cut the processing time</h2>
+<p>Not in the scope of this assignment, it will be convenient to add the following statements to accelerate the processing
+time by using in parallel more than one CPUs</p>
+<pre><code class="r">install.packages(&quot;doParallel&quot;)
+library(doParallel)
+cl &lt;- makeCluster(detectCores())
+registerDoParallel(cl)
+</code></pre>
