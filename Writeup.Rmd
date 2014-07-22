@@ -118,14 +118,32 @@ correlMatrix[which(correlMatrix > 0.98 & correlMatrix != 1)]
 correlMatrix[which(correlMatrix < -0.98 )]
 
 
-## Predictive Model
+## Predictive Model - Method 1
+Now , its time to pre-process the data using a principal component analysis, leaving out the column we want to predict ('classe'). 
+After pre-processing, we use the 'predict' function to apply the pre-processing to the training and validation 
+of the final training dataset.
+```{r}
 preProc <- preProcess(finaltrain_train[, -53], method = "pca", thresh = 0.99)
 trainPC <- predict(preProc, finaltrain_train[, -53])
 validationTestPC <- predict(preProc, finaltrain_valid[, -53])
+```
 
+Now, we train a model using a random forest approach on the smaller training dataset. 
+Note that we chose to specify the use of a cross validation method when applying the random forest routine in the
+'trainControl()' parameter. Worth mentioning that without specifying this, the default method (bootstrapping) 
+would have been used. The bootstrapping method take a much longer time to complete, and we get the same level of 'accuracy'.
 
+```{r}
 modelFit <- train(finaltrain_train$classe ~ ., method = "rf", data = trainPC, trControl = trainControl(method = "cv", number = 4), importance = TRUE)
+This took some minuts to process, (and therefore I'll try using a different function.)
+modelFit
+modelFit$finalModel
+```
 
+Now can review the relative importance of the resulting principal components of the trained model, 'modelFit':
+```{r}
+varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = .6,  main = "Importance of the Individual Principal Components")
+```
 
 
 
