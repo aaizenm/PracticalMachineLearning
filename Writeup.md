@@ -214,7 +214,7 @@ finalprediction3<-predict(model3, finaltest)
 
 ## Conclusion: 
 The model achieves 100% accuracy on the testing set provided.
-
+Conclusion, the algorithm employed by them made good use of provided predictors.
 
 
 Writing the text files, we'll use the following function:
