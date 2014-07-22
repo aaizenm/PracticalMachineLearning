@@ -144,8 +144,10 @@ This method will give us an error rate: 1.88%
 Now can review the relative importance of the resulting principal components of the trained model, 'modelFit':
 
 ```{r}
-varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = .6,  main = "Importance of the Individual Principal Components")
+varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = .6,  main = "Importance of the Principal Variables")
 ```
+![plot of plotvariables](plots/plotvariables.png) 
+
 Now we show the The degree of importance is shown on the x-axis–increasing from left to right. 
 
 
