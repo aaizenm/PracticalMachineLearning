@@ -71,8 +71,8 @@ X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, new_wi
 
 ```{r}
 todelete_cols <- grepl("X|user_name|new_window|num_window|raw_timestamp_part_1|raw_timestamp_part_2|cvtd_timestamp", colnames(newtrain))
-finaltrain <- newtrai[, !todelete_cols]
 finaltrain <- newtrain[, !todelete_cols]
+finaltest <- newtest[, !todelete_cols]
 #names(finaltrain)
 
 Now we have 53 columns to work with.
@@ -160,16 +160,48 @@ cl <- makeCluster(detectCores())
 registerDoParallel(cl)
 ```
 
+
+
+
+
+
+
 ## Predictive Model - Method 2
+Using the randomForest model fuction with the complete dataset (before spliting it for the validation process used in the
+Method 1)
 set.seed(1234)
 dim(finaltrain_train)
 For the dimensions of our problem I would start ntree=1024
 ```{r}
-model2 <- randomForest(classe ~ ., data = finaltrain_train, ntree = 1024)
-model2
-It will give us an OOB estimate of  error rate: 0.5%
+model3 <- randomForest(classe ~ ., data = finaltrain, ntree = 1024)
+model3
+It will give us an OOB estimate of  error rate: 0.27%, which is very good!
+As well the confusion Matrix looks good, indicating that the model fit the training set well.
+```
 
-Let's try with ntree=2048
+Now lets calculate the variable importance order estimate that we got from the classifier training algorithm.
+```{r}
+imp3<-varImp(model3)
+imp3$variables<-row.names(imp3)
+imp3[order(imp3$Overall,decreasing=T),]
+```
+Only very few variables have lower importance measure more than the most important variables (roll_belt, yaw_belt), 
+which seems to indicate the algorithm employed by them, it made good use of provided predictors.
+
+## Apply it on 20 test cases for automatic grading
+The following command can be used to obtain model's prediction for the assigned testing data set:
+
+```{r}
+predict(model3, finaltest)
+'''
+Conclusion: The model achieves 100% accuracy on the testing set provided.
+
+
+
+
+
+
+
 
 
 
