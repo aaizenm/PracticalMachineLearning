@@ -134,10 +134,14 @@ Note that we chose to specify the use of a cross validation method when applying
 would have been used. The bootstrapping method take a much longer time to complete, and we get the same level of 'accuracy'.
 
 ```{r}
+Based on our problem: multi-dimensional classification with number of observations much exceeding the number of predictors,
+Random forest is a good choice.
+
 modelFit <- train(finaltrain_train$classe ~ ., method = "rf", data = trainPC, trControl = trainControl(method = "cv", number = 4), importance = TRUE)
 This took some minutes to process, (and therefore I'll try using a different method.)
 modelFit
 modelFit$finalModel
+This method will give us an error rate: 1.88%
 ```
 
 Now can review the relative importance of the resulting principal components of the trained model, 'modelFit':
@@ -157,6 +161,21 @@ registerDoParallel(cl)
 ```
 
 ## Predictive Model - Method 2
+set.seed(1234)
+dim(finaltrain_train)
+For the dimensions of our problem I would start ntree=1024
+```{r}
+model2 <- randomForest(classe ~ ., data = finaltrain_train, ntree = 1024)
+model2
+It will give us an OOB estimate of  error rate: 0.5%
+
+Let's try with ntree=2048
+
+
+
+
+
+
 
 
 
