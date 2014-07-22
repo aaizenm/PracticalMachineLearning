@@ -119,6 +119,7 @@ correlMatrix[which(correlMatrix < -0.98 )]
 
 
 ## Predictive Model - Method 1
+###############################
 Now , its time to pre-process the data using a principal component analysis, leaving out the column we want to predict ('classe'). 
 After pre-processing, we use the 'predict' function to apply the pre-processing to the training and validation 
 of the final training dataset.
@@ -150,23 +151,31 @@ varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = 
 ```
 Now we show the The degree of importance is shown on the x-axis–increasing from left to right. 
 
-## Making my PC to work in parallel to cut the processing time
-Not in the scope of this assignment, it will be convenient to add the following statements to accelerate the processing
-time by using in parallel more than one CPUs
+
+## Cross Validation Testing and Out-of-Sample Error Estimate
+Call the 'predict' function again so that our trained model can be applied to our cross validation test dataset.
+
 ```{r}
-install.packages("doParallel")
-library(doParallel)
-cl <- makeCluster(detectCores())
-registerDoParallel(cl)
+predictionvalidationrf <- predict(modelFit, validationTestPC)
+confusionMatrix(finaltrain_valid$classe, predictionvalidationrf)
 ```
 
+Which gives an Accuracy : 97.7% 
+And an estimated out-of-sample error based applying to the cross validation dataset is 2.33%.
 
+## Predicted Results
 
-
-
+```{r}
+testPC<-predict(preProc, finaltest[,-53])
+predictionfinal1<-predict(modelFit, testPC)
+predictionfinal1
+'''
+Conclusion: The model achieves 90% accuracy on the testing set provided.
+So, I am going to predict with a different function (randomForest)
 
 
 ## Predictive Model - Method 2
+##############################
 Using the randomForest model fuction with the complete dataset (before spliting it for the validation process used in the
 Method 1)
 set.seed(1234)
@@ -188,7 +197,8 @@ imp3[order(imp3$Overall,decreasing=T),]
 Only very few variables have lower importance measure more than the most important variables (roll_belt, yaw_belt), 
 which seems to indicate the algorithm employed by them, it made good use of provided predictors.
 
-## Apply it on 20 test cases for automatic grading
+
+## Predicted Results and apply it on 20 test cases for automatic grading
 The following command can be used to obtain model's prediction for the assigned testing data set:
 
 ```{r}
@@ -210,6 +220,15 @@ pml_write_files = function(x) {
 pml_write_files(as.character(finalprediction3))
 ```
 
+## Making my PC to work in parallel to cut the processing time
+Not in the scope of this assignment, it will be convenient to add the following statements to accelerate the processing
+time by using in parallel more than one CPUs
+```{r}
+install.packages("doParallel")
+library(doParallel)
+cl <- makeCluster(detectCores())
+registerDoParallel(cl)
+```
 
 
 
