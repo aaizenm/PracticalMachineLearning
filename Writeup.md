@@ -1,8 +1,6 @@
 ## Backgrownd
 
-For this assignment, I build a predictive model to determine whether a particular form of exercise (barbell 
-
-lifting) 
+For this assignment, I build a predictive model to determine whether a particular form of exercise (barbell lifting) 
 is performed correctly, using accelerometer data.
 
 ## Loading of the packages
@@ -34,8 +32,6 @@ dim(test)
 dim(train)
 ```
 
-#names(train)
-
 ## Cleaning the data
 
 We see that the training set consists of 19622 observations of 160 variables
@@ -64,20 +60,14 @@ dim(newtrain)
 
 As we see we have eliminated 2/3 of the columns. 60 columns.
 
-#head(newtrain)
-
-Some of the variables in this new data set do not come from accelerometer measurements and record 
-
-experimental
+Some of the variables in this new data set do not come from accelerometer measurements and record experimental
 setup or participants' data.
 
 So the following variables will be take out as well: 
 X, user_name, raw_timestamp_part_1, raw_timestamp_part_2, cvtd_timestamp, new_window and num_window.
 
 ```{r}
-todelete_cols <- grepl("X|user_name|new_window|num_window|raw_timestamp_part_1|raw_timestamp_part_2|
-
-cvtd_timestamp", colnames(newtrain))
+todelete_cols <- grepl("X|user_name|new_window|num_window|raw_timestamp_part_1|raw_timestamp_part_2|cvtd_timestamp", colnames(newtrain))
 finaltrain <- newtrain[, !todelete_cols]
 finaltest <- newtest[, !todelete_cols]
 #names(finaltrain)
@@ -111,16 +101,11 @@ This is the "classe" variable in the training set.
 
 ```{r}
 correlMatrix <- cor(finaltrain_train[, -53])
-corrplot(correlMatrix, order = "FPC", method = "circle", type = "lower", tl.cex = 0.8,  tl.col = rgb(0, 0, 
-
-0))
+corrplot(correlMatrix, order = "FPC", method = "circle", type = "lower", tl.cex = 0.8,  tl.col = rgb(0, 0, 0))
 ```
 
 This correlation plot shows the correlation between pairs of the predictors in our dataset. 
-From a high-level perspective darker blue and darker red circles indicate high positive and high negative 
-
-correlations, 
-respectively. 
+From a high-level perspective darker blue and darker red circles indicate high positive and high negative correlations, respectively. 
 
 Nonetheless, there are a few pairs of variables that are highly correlated:
 
@@ -133,13 +118,8 @@ correlMatrix[which(correlMatrix < -0.98 )]
 
 ## Predictive Model - Method 1
 ###############################
-Now , its time to pre-process the data using a principal component analysis, leaving out the column we want 
-
-to predict ('classe'). 
-After pre-processing, we use the 'predict' function to apply the pre-processing to the training and 
-
-validation 
-of the final training dataset.
+Now , its time to pre-process the data using a principal component analysis, leaving out the column we want to predict ('classe'). 
+After pre-processing, we use the 'predict' function to apply the pre-processing to the training and validation of the final training dataset.
 
 ```{r}
 preProc <- preProcess(finaltrain_train[, -53], method = "pca", thresh = 0.99)
@@ -148,23 +128,12 @@ validationTestPC <- predict(preProc, finaltrain_valid[, -53])
 ```
 
 Now, we train a model using a random forest approach on the smaller training dataset. 
-Note that we chose to specify the use of a cross validation method when applying the random forest routine in 
+Note that we chose to specify the use of a cross validation method when applying the random forest routine in the 'trainControl()' parameter. Worth mentioning that without specifying this, the default method (bootstrapping) would have been used. The bootstrapping method take a much longer time to complete, and we get the same level of 'accuracy'.
 
-the
-'trainControl()' parameter. Worth mentioning that without specifying this, the default method (bootstrapping) 
-would have been used. The bootstrapping method take a much longer time to complete, and we get the same level 
-
-of 'accuracy'.
-
-Based on our problem: multi-dimensional classification with number of observations much exceeding the number 
-
-of predictors,
-Random forest is a good choice.
+Based on our problem: multi-dimensional classification with number of observations much exceeding the number of predictors, Random forest is a good choice.
 
 ```{r}
-modelFit <- train(finaltrain_train$classe ~ ., method = "rf", data = trainPC, trControl = trainControl(method 
-
-= "cv", number = 4), importance = TRUE)
+modelFit <- train(finaltrain_train$classe ~ ., method = "rf", data = trainPC, trControl = trainControl(method = "cv", number = 4), importance = TRUE)
 modelFit
 modelFit$finalModel
 
@@ -172,21 +141,16 @@ modelFit$finalModel
 This took some minutes to process, (and therefore I'll try using a different method.)
 This method will give us an error rate: 1.88%
 
-Now can review the relative importance of the resulting principal components of the trained model, 
+Now can review the relative importance of the resulting principal components of the trained model, 'modelFit':
 
-'modelFit':
 ```{r}
-varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = .6,  main = "Importance of 
-
-the Individual Principal Components")
+varImpPlot(modelFit$finalModel, sort = TRUE, type = 1, pch = 19, col = 1, cex = .6,  main = "Importance of the Individual Principal Components")
 ```
 Now we show the The degree of importance is shown on the x-axis–increasing from left to right. 
 
 
 ## Cross Validation Testing and Out-of-Sample Error Estimate
-Call the 'predict' function again so that our trained model can be applied to our cross validation test 
-
-dataset.
+Call the 'predict' function again so that our trained model can be applied to our cross validation test dataset.
 
 ```{r}
 predictionvalidationrf <- predict(modelFit, validationTestPC)
@@ -202,19 +166,18 @@ And an estimated out-of-sample error based applying to the cross validation data
 testPC<-predict(preProc, finaltest[,-53])
 predictionfinal1<-predict(modelFit, testPC)
 predictionfinal1
-'''
+```
 Conclusion: The model achieves 90% accuracy on the testing set provided.
 So, I am going to predict with a different function (randomForest)
 
 
 ## Predictive Model - Method 2
 ##############################
-Using the randomForest model fuction with the complete dataset (before spliting it for the validation process 
-
-used in the
+Using the randomForest model fuction with the complete dataset (before spliting it for the validation process used in the
 Method 1)
 
 For the dimensions of our problem I would start ntree=1024
+
 ```{r}
 set.seed(1234)
 dim(finaltrain_train)
@@ -234,9 +197,7 @@ imp3<-varImp(model3)
 imp3$variables<-row.names(imp3)
 imp3[order(imp3$Overall,decreasing=T),]
 ```
-Only very few variables have lower importance measure more than the most important variables (roll_belt, 
-
-yaw_belt), 
+Only very few variables have lower importance measure more than the most important variables (roll_belt, yaw_belt), 
 which seems to indicate the algorithm employed by them, it made good use of provided predictors.
 
 
@@ -245,7 +206,7 @@ The following command can be used to obtain model's prediction for the assigned 
 
 ```{r}
 finalprediction3<-predict(model3, finaltest)
-'''
+```
 
 Conclusion: The model achieves 100% accuracy on the testing set provided.
 
@@ -267,9 +228,7 @@ pml_write_files(as.character(finalprediction3))
 ```
 
 ## Making my PC to work in parallel to cut the processing time
-Not in the scope of this assignment, it will be convenient to add the following statements to accelerate the 
-
-processing
+Not in the scope of this assignment, it will be convenient to add the following statements to accelerate the processing
 time by using in parallel more than one CPUs
 
 ```{r}
@@ -278,4 +237,3 @@ library(doParallel)
 cl <- makeCluster(detectCores())
 registerDoParallel(cl)
 ```
-
