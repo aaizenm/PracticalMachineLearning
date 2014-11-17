@@ -212,8 +212,9 @@ The following command can be used to obtain model's prediction for the assigned 
 finalprediction3<-predict(model3, finaltest)
 ```
 
-Conclusion: The model achieves 100% accuracy on the testing set provided.
-
+## Conclusion: 
+The model achieves 100% accuracy on the testing set provided.
+Conclusion, the algorithm employed by them made good use of provided predictors.
 
 
 Writing the text files, we'll use the following function:
